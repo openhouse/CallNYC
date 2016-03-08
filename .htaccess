@@ -1,0 +1,9 @@
+<ifmodule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.callnyc\.org$ [NC]
+  RewriteRule ^(.*)$ http://callnyc.org/$1 [R=301,L]
+  RewriteBase /
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(.*)$ index.php [QSA,L]
+</ifmodule>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="532.8px" height="311px" viewBox="279.7 217.6 532.8 311" enable-background="new 279.7 217.6 532.8 311"
+	 xml:space="preserve">
+<font horiz-adv-x="2048">
+<!-- Roboto is a trademark of Google. -->
+<!-- Copyright: Copyright 2016 Adobe System Incorporated. All rights reserved. -->
+<font-face font-family="Roboto-Black" units-per-em="2048" underline-position="-150" underline-thickness="100"/>
+<missing-glyph horiz-adv-x="510"/>
+<glyph unicode="C" horiz-adv-x="1316" d="M1248,511l2,-6C1243,334 1193,204 1099,114C1004,24 867,-21 688,-21C508,-21 362,34 249,145C136,256 80,399 80,576l0,304C80,1056 134,1200 243,1311C351,1422 492,1477 665,1477C849,1477 990,1431 1087,1338C1184,1245 1239,1114 1252,943l-2,-6l-329,0C916,1032 895,1102 858,1148C820,1194 756,1217 665,1217C588,1217 528,1186 484,1125C440,1063 418,982 418,882l0,-306C418,475 442,394 490,332C538,270 604,239 688,239C769,239 827,261 861,304C895,347 914,416 919,511z"/>
+<glyph unicode="N" horiz-adv-x="1444" d="M1329,0l-337,0l-533,928l-6,-2l0,-926l-339,0l0,1456l339,0l533,-928l6,2l0,926l337,0z"/>
+<glyph unicode="Y" horiz-adv-x="1310" d="M651,820l6,0l290,636l367,0l-495,-944l0,-512l-337,0l0,529l-485,927l365,0z"/>
+</font>
+
+	<font horiz-adv-x="2048">
+<!-- Roboto is a trademark of Google. -->
+<!-- Copyright: Copyright 2016 Adobe System Incorporated. All rights reserved. -->
+<font-face font-family="Roboto-Regular" units-per-em="2048" underline-position="-150" underline-thickness="100"/>
+<missing-glyph horiz-adv-x="509"/>
+<glyph unicode="A" horiz-adv-x="1326" d="M969,375l-610,0l-138,-375l-201,0l563,1456l169,0l554,-1456l-201,0M420,540l490,0l-240,663l-6,0z"/>
+<glyph unicode="C" horiz-adv-x="1297" d="M1209,466l2,-6C1214,323 1166,209 1067,117C968,25 838,-21 676,-21C511,-21 377,37 274,154C170,271 118,419 118,598l0,259C118,1036 170,1185 274,1302C377,1419 511,1477 676,1477C841,1477 972,1433 1069,1346C1166,1258 1214,1142 1211,997l-2,-6l-189,0C1020,1093 990,1174 930,1233C870,1292 785,1322 676,1322C566,1322 478,1278 413,1189C348,1100 315,990 315,859l0,-261C315,465 348,355 413,266C478,177 566,133 676,133C785,133 870,163 930,222C990,281 1020,362 1020,466z"/>
+<glyph unicode="L" horiz-adv-x="1106" d="M377,154l689,0l0,-154l-886,0l0,1456l197,0z"/>
+</font>
+
+	<rect x="333" y="300" display="none" fill="#3FFFA1" width="205" height="147"/>
+<g>
+	<circle opacity="0.3144" fill="#FFFFFF" stroke="#000000" stroke-width="21" stroke-miterlimit="10" cx="657" cy="373.1" r="145"/>
+	
+		<circle opacity="0.4624" fill="#FFFFFF" stroke="#000000" stroke-width="21" stroke-miterlimit="10" cx="580.2" cy="373.1" r="145"/>
+	<circle opacity="0.68" fill="#FFFFFF" stroke="#000000" stroke-width="21" stroke-miterlimit="10" cx="512" cy="373.1" r="145"/>
+	<circle fill="#FFFFFF" stroke="#000000" stroke-width="21" stroke-miterlimit="10" cx="435.2" cy="373.1" r="145"/>
+	<text transform="matrix(1 0 0 1 325.4053 449.2148)" font-family="'Roboto-Black'" font-size="109.4762">NYC</text>
+	<text transform="matrix(1 0 0 1 328.5781 353.4902)" font-family="'Roboto-Regular'" font-size="81.1923" letter-spacing="5">CAL</text>
+	<text transform="matrix(1 0 0 1 495.7783 353.4902)" font-family="'Roboto-Regular'" font-size="81.1923">L</text>
+</g>
+</svg>
