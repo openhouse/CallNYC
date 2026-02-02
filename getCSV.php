@@ -16,17 +16,25 @@ limitations under the License.
 
 */
 
-  include_once('library/dbinfo.php');
-  include_once('library/opendb.php');
   include_once('functions.php');
+  include_once('library/db.php');
+
+  if (is_archived()) {
+    http_response_code(403);
+    echo 'Archived mode enabled.';
+    exit;
+  }
+
+  $db = get_db_connection();
 
   $url = "https://data.cityofnewyork.us/api/views/edai-dig6/rows.csv?accessType=DOWNLOAD&bom=false&query=select+*";
 
   $n=0;
   $valid = false;
+  $insertStatement = null;
+
   if (($handle = fopen($url, "r")) !== FALSE) {
     while (($data = fgetcsv($handle, 0, ",")) !== FALSE) {
-
       if($n==0){
         // first row is column names
         // validate csv here as well
@@ -50,55 +58,36 @@ limitations under the License.
           $valid = true;
           // empty the table to remove deleted cases (spam etc)
           $db->query("TRUNCATE TABLE `cases`");
+          $insertStatement = $db->prepare(
+            "REPLACE INTO `cases` (`UNIQUE_KEY`, `ACCOUNT`, `OPENDATE`, `COMPLAINT_TYPE`,
+              `DESCRIPTOR`, `ZIP`, `BOROUGH`, `CITY`, `COUNCIL_DIST`, `COMMUNITY_BOARD`, `CLOSEDATE`,
+              `OPENDATE_INT`, `CLOSEDATE_INT`) VALUES
+              (:unique_key, :account, :opendate, :complaint_type, :descriptor, :zip, :borough,
+              :city, :council_dist, :community_board, :closedate, :opendate_int, :closedate_int)"
+          );
         }
-        var_dump($keys);
       } else {
         $data[]=strtotime($data[array_search('OPENDATE', $keys)]);
         $data[]=strtotime($data[array_search('CLOSEDATE', $keys)]);
 
-        if($valid){
-          $query = "REPLACE INTO `cases` (`UNIQUE_KEY`, `ACCOUNT`, `OPENDATE`, `COMPLAINT_TYPE`,
-            `DESCRIPTOR`, `ZIP`, `BOROUGH`, `CITY`, `COUNCIL_DIST`, `COMMUNITY_BOARD`, `CLOSEDATE`,
-            `OPENDATE_INT`, `CLOSEDATE_INT`) VALUES
-            (
-              '".$data[array_search('UNIQUE_KEY', $keys)]."',
-              '".$data[array_search('ACCOUNT', $keys)]."',
-              '".$data[array_search('OPENDATE', $keys)]."',
-              '".$data[array_search('COMPLAINT_TYPE', $keys)]."',
-              '".$data[array_search('DESCRIPTOR', $keys)]."',
-              '".$data[array_search('ZIP', $keys)]."',
-              '".$data[array_search('BOROUGH', $keys)]."',
-              '".$data[array_search('CITY', $keys)]."',
-              '".$data[array_search('COUNCIL_DIST', $keys)]."',
-              '".$data[array_search('COMMUNITY_BOARD', $keys)]."',
-              '".$data[array_search('CLOSEDATE', $keys)]."',
-              ".$data[array_search('OPENDATE_INT', $keys)].",
-              ".$data[array_search('CLOSEDATE_INT', $keys)]."
-            )";
-
-          //$query = "REPLACE INTO `cases` (`".implode('`, `', $keys)."`) VALUES ('".implode("', '", $data)."')";
-
-          $db->query($query);
-          //echo "\n".$query."\n\n";
+        if($valid && $insertStatement){
+          $insertStatement->execute([
+            ':unique_key' => $data[array_search('UNIQUE_KEY', $keys)],
+            ':account' => $data[array_search('ACCOUNT', $keys)],
+            ':opendate' => $data[array_search('OPENDATE', $keys)],
+            ':complaint_type' => $data[array_search('COMPLAINT_TYPE', $keys)],
+            ':descriptor' => $data[array_search('DESCRIPTOR', $keys)],
+            ':zip' => $data[array_search('ZIP', $keys)],
+            ':borough' => $data[array_search('BOROUGH', $keys)],
+            ':city' => $data[array_search('CITY', $keys)],
+            ':council_dist' => $data[array_search('COUNCIL_DIST', $keys)],
+            ':community_board' => $data[array_search('COMMUNITY_BOARD', $keys)],
+            ':closedate' => $data[array_search('CLOSEDATE', $keys)],
+            ':opendate_int' => $data[array_search('OPENDATE_INT', $keys)],
+            ':closedate_int' => $data[array_search('CLOSEDATE_INT', $keys)],
+          ]);
         }
-
-
-
-        //var_dump($data);
       }
-
-      /*
-      if($n > 2){
-        exit;
-      }
-      */
-
-      /*process your data here*/
-      $timestamp = $data[0]; //timestamp
-      $orderId = $data[1];
-      $productId = $data[2];
-      $stars = $data[3];
-      $review = $data[4];
 
       $n++;
     }
