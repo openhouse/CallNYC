@@ -10,7 +10,11 @@
    ```sh
    docker compose up --build
    ```
-3. Open the app at: http://localhost:8080
+3. Seed data (only needed on first run; bootstrap runs this automatically if `cases` is missing):
+   ```sh
+   docker compose exec web php bin/seed.php
+   ```
+4. Open the app at: http://localhost:8080
 
 Docker Compose mounts the repo into the container so edits are reflected on refresh.
 
@@ -23,6 +27,13 @@ docker compose exec web php bin/seed.php
 ```
 
 This script is idempotent and safe to re-run.
+
+## Troubleshooting
+
+- If you see `Table 'callnyc.cases' doesn't exist`, seed the database:
+  ```sh
+  docker compose exec web php bin/seed.php
+  ```
 
 ## Archive mode
 
