@@ -13,3 +13,5 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 EXPOSE 5000
+
+CMD ["bash", "-lc", "php bin/bootstrap.php && apache2-foreground"]
