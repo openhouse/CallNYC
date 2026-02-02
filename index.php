@@ -33,8 +33,11 @@ limitations under the License.
   include_once('phonenumbers.php');
 
   //open db
-  include_once('library/dbinfo.php');
-  include_once('library/opendb.php');
+  include_once('library/db.php');
+  $db = get_db_connection();
+
+  $baseUrl = base_url();
+  $isArchived = is_archived();
 
 
 
@@ -66,10 +69,14 @@ limitations under the License.
   if($activeCategory && $activeSubCategory){
 
 
-    $query = "SELECT `ACCOUNT`, COUNT(*) FROM `cases` WHERE `COMPLAINT_TYPE` LIKE '".$activeCategory["COMPLAINT_TYPE"]."' AND `DESCRIPTOR` LIKE '".$activeSubCategory["DESCRIPTOR"]."' AND `BOROUGH` != '' GROUP BY `ACCOUNT` ORDER BY COUNT(*) DESC LIMIT 10";
-    foreach( $db->query($query) as $row ) {
+    $statement = $db->prepare("SELECT `ACCOUNT`, COUNT(*) AS count FROM `cases` WHERE `COMPLAINT_TYPE` LIKE :complaint_type AND `DESCRIPTOR` LIKE :descriptor AND `BOROUGH` != '' GROUP BY `ACCOUNT` ORDER BY count DESC LIMIT 10");
+    $statement->execute([
+      ':complaint_type' => $activeCategory["COMPLAINT_TYPE"],
+      ':descriptor' => $activeSubCategory["DESCRIPTOR"],
+    ]);
+    foreach( $statement->fetchAll() as $row ) {
       $member['ACCOUNT'] = $row['ACCOUNT'];
-      $member['count'] = $row['COUNT(*)'];
+      $member['count'] = $row['count'];
       $member['monthly'] = ceil($member['count'] / 428 * (365.25/12)); //TODO: get number of days in data
       $member['annual'] = ceil($member['count'] / 428 * (365.25)); //TODO: get number of days in data
 
@@ -78,12 +85,15 @@ limitations under the License.
       $member['districtFull'] = $allMembers[$member['district']]['districtFull'];
       $member['categories'] = [];
 
-      $query2 = "SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) FROM `cases` WHERE `ACCOUNT` LIKE '".$member['ACCOUNT']."' AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY COUNT(*) DESC LIMIT 7";
-      foreach( $db->query($query2) as $row2 ) {
+      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
+      $statement2->execute([
+        ':account' => $member['ACCOUNT'],
+      ]);
+      foreach( $statement2->fetchAll() as $row2 ) {
         $memberCategory['name'] = trim($row2["DESCRIPTOR"], ' /');
         $memberCategory['DESCRIPTOR'] = $row2["DESCRIPTOR"];
         $memberCategory['slug'] = slugify($memberCategory['name']);
-        $memberCategory['count'] = $row2["COUNT(*)"];
+        $memberCategory['count'] = $row2["count"];
 
         $memberCategory['parent']['name'] = trim($row2["COMPLAINT_TYPE"], ' /');
         $memberCategory['parent']['COMPLAINT_TYPE'] = $row2["COMPLAINT_TYPE"];
@@ -109,10 +119,10 @@ limitations under the License.
 
     $frontPage=true;
 
-    $query = "SELECT `ACCOUNT`, COUNT(*) FROM `cases` WHERE `BOROUGH` != '' GROUP BY `ACCOUNT` ORDER BY COUNT(*) DESC";
+    $query = "SELECT `ACCOUNT`, COUNT(*) AS count FROM `cases` WHERE `BOROUGH` != '' GROUP BY `ACCOUNT` ORDER BY count DESC";
     foreach( $db->query($query) as $row ) {
       $member['ACCOUNT'] = $row['ACCOUNT'];
-      $member['count'] = $row['COUNT(*)'];
+      $member['count'] = $row['count'];
       $member['monthly'] = ceil($member['count'] / 428 * (365.25/12)); //TODO: get number of days in data
       $member['annual'] = ceil($member['count'] / 428 * (365.25)); //TODO: get number of days in data
 
@@ -121,12 +131,15 @@ limitations under the License.
       $member['districtFull'] = $allMembers[$member['district']]['districtFull'];
       $member['categories'] = [];
 
-      $query2 = "SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) FROM `cases` WHERE `ACCOUNT` LIKE '".$member['ACCOUNT']."' AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY COUNT(*) DESC LIMIT 7";
-      foreach( $db->query($query2) as $row2 ) {
+      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
+      $statement2->execute([
+        ':account' => $member['ACCOUNT'],
+      ]);
+      foreach( $statement2->fetchAll() as $row2 ) {
         $memberCategory['name'] = trim($row2["DESCRIPTOR"], ' /');
         $memberCategory['DESCRIPTOR'] = $row2["DESCRIPTOR"];
         $memberCategory['slug'] = slugify($memberCategory['name']);
-        $memberCategory['count'] = $row2["COUNT(*)"];
+        $memberCategory['count'] = $row2["count"];
 
         $memberCategory['parent']['name'] = trim($row2["COMPLAINT_TYPE"], ' /');
         $memberCategory['parent']['COMPLAINT_TYPE'] = $row2["COMPLAINT_TYPE"];
@@ -167,7 +180,7 @@ limitations under the License.
       if($frontPage){
         ?>
         <title>Call NYC - Free Assistance from Top NYC Council Members</title>
-        <link rel="canonical" href="http://callnyc.org" />
+        <link rel="canonical" href="<?php echo $baseUrl; ?>" />
         <meta name="apple-mobile-web-app-title"
               content="Call NYC">
 
@@ -175,7 +188,7 @@ limitations under the License.
       } else {
         ?>
           <title><?php echo ucwords($activeSubCategory['name']) ?> Assistance Top <?php echo count($members);?> - CallNYC.org | Free <?php echo ucwords($activeCategory['name']) ?> Services from New York City Council</title>
-          <link rel="canonical" href="http://callnyc.org/<?php echo $activeCategory['slug'];?>/<?php echo $activeSubCategory['slug'];?>.html" />
+          <link rel="canonical" href="<?php echo $baseUrl; ?>/<?php echo $activeCategory['slug'];?>/<?php echo $activeSubCategory['slug'];?>.html" />
           <meta name="apple-mobile-web-app-title"
                 content="<?php echo ucwords($activeSubCategory['name']) ?>">
 
@@ -259,7 +272,7 @@ limitations under the License.
     <header>
       <div class="container"><a href="#" data-activates="nav-mobile" class="button-collapse top-nav full hide-on-large-only"><i class="mdi-navigation-menu"></i></a></div>
       <ul id="nav-mobile" class="side-nav fixed">
-        <li class="logo"><a id="logo-container" href="http://callnyc.org/" class="brand-logo">
+        <li class="logo"><a id="logo-container" href="/" class="brand-logo">
             <object id="front-page-logo" type="image/svg+xml" data="/call-nyc-logo.svg">Your browser does not support SVG</object></a></li>
         <li class="search">
           <div class="search-wrapper card">
@@ -292,6 +305,13 @@ limitations under the License.
       </ul>
     </header>
     <main>
+      <?php if ($isArchived) { ?>
+        <div class="archive-banner" style="background:#fff3cd; color:#664d03; border-bottom:1px solid #ffeeba;">
+          <div class="container" style="padding:8px 0;">
+            Archived project demo (snapshot). Not official, not current.
+          </div>
+        </div>
+      <?php } ?>
       <div class="section" id="index-banner">
   <div class="container">
     <div class="row">
@@ -452,10 +472,13 @@ limitations under the License.
         <div class="row">
           <div class="col l8 s12">
             <h5 class="white-text">Powered by NYCC Constituent Services Data</h5>
-            <p class="grey-text text-lighten-4">Every year tens of thousands of New Yorkers call their New York City Council members seeking assistance.  <a target="_blank" class="grey-text text-lighten-5" style="text-decoration: underline;" href="http://labs.council.nyc/districts/">All 51 City Council district offices</a> have staff dedicated to personally solving these often complex cases.</p>
+            <?php if ($isArchived) { ?>
+              <p class="grey-text text-lighten-4">Archived project demo (snapshot). Not official, not current.</p>
+            <?php } ?>
+            <p class="grey-text text-lighten-4">Every year tens of thousands of New Yorkers call their New York City Council members seeking assistance.  <a target="_blank" class="grey-text text-lighten-5" style="text-decoration: underline;" href="https://labs.council.nyc/districts/">All 51 City Council district offices</a> have staff dedicated to personally solving these often complex cases.</p>
             <p class="grey-text text-lighten-4">In 2016 New York City Council began publishing anonymized daily records of this casework.  This is the data which powers CallNYC.org.  It gives an up-to-today picture of work happening in New York City Council district offices.</p>
             <p class="grey-text text-lighten-4"> Not all City Council members opt to publish their service data and different members use the system in different ways.  As such CallNYC.org can only offer a picture of members who use the system.  Explore the Constituent Services Data yourself on the New York City Council's web site.</p>
-            <a class="btn waves-effect waves-light red lighten-3" target="_blank" href="http://labs.council.nyc/districts/data/">Explore the Data</a>
+            <a class="btn waves-effect waves-light red lighten-3" target="_blank" href="https://labs.council.nyc/districts/data/">Explore the Data</a>
 
           </div>
 

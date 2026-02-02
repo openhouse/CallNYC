@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `cases` (
+  `UNIQUE_KEY` varchar(64) NOT NULL,
+  `ACCOUNT` varchar(32) NOT NULL,
+  `OPENDATE` varchar(32) DEFAULT NULL,
+  `COMPLAINT_TYPE` varchar(255) DEFAULT NULL,
+  `DESCRIPTOR` varchar(255) DEFAULT NULL,
+  `ZIP` varchar(16) DEFAULT NULL,
+  `BOROUGH` varchar(64) DEFAULT NULL,
+  `CITY` varchar(64) DEFAULT NULL,
+  `COUNCIL_DIST` varchar(32) DEFAULT NULL,
+  `COMMUNITY_BOARD` varchar(64) DEFAULT NULL,
+  `CLOSEDATE` varchar(32) DEFAULT NULL,
+  `OPENDATE_INT` bigint DEFAULT NULL,
+  `CLOSEDATE_INT` bigint DEFAULT NULL,
+  PRIMARY KEY (`UNIQUE_KEY`),
+  KEY `idx_account` (`ACCOUNT`),
+  KEY `idx_complaint_descriptor` (`COMPLAINT_TYPE`, `DESCRIPTOR`),
+  KEY `idx_borough` (`BOROUGH`),
+  KEY `idx_opendate_int` (`OPENDATE_INT`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

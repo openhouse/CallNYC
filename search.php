@@ -28,8 +28,8 @@ limitations under the License.
       include_once('functions.php');
 
       //open db
-      include_once('library/dbinfo.php');
-      include_once('library/opendb.php');
+      include_once('library/db.php');
+      $db = get_db_connection();
 
 
 
@@ -64,7 +64,7 @@ limitations under the License.
       foreach($lilCats as &$cat){
         ?>
           window.index.add({
-            href: 'http://callnyc.org/<?php echo $cat['topCatSlug'];?>/<?php echo $cat['slug'];?>.html',
+            href: '/<?php echo $cat['topCatSlug'];?>/<?php echo $cat['slug'];?>.html',
             title: '<?php echo $cat['name'];?>',
             body: '<?php echo $cat['name'];?>'
           });
@@ -124,7 +124,7 @@ limitations under the License.
 
       var query = $(this).val();
       var results = window.index.search(query).slice(0, 6).map(function (result) {
-        var href = result.ref.split('http://callnyc.org/')[1];
+        var href = result.ref.replace(/^\//, '');
         return [href.charAt(0).toUpperCase() + href.slice(1), result.ref];
       });
       renderResults(results);
