@@ -43,10 +43,24 @@ foreach ($expected as $header) {
 
 $insert = $pdo->prepare(
   "INSERT INTO `cases` (`UNIQUE_KEY`, `ACCOUNT`, `OPENDATE`, `COMPLAINT_TYPE`, `DESCRIPTOR`, `ZIP`, `BOROUGH`, `CITY`, `COUNCIL_DIST`, `COMMUNITY_BOARD`, `CLOSEDATE`, `OPENDATE_INT`, `CLOSEDATE_INT`)
-   VALUES (:unique_key, :account, :opendate, :complaint_type, :descriptor, :zip, :borough, :city, :council_dist, :community_board, :closedate, :opendate_int, :closedate_int)"
+   VALUES (:unique_key, :account, :opendate, :complaint_type, :descriptor, :zip, :borough, :city, :council_dist, :community_board, :closedate, :opendate_int, :closedate_int)
+   ON DUPLICATE KEY UPDATE
+     `ACCOUNT` = VALUES(`ACCOUNT`),
+     `OPENDATE` = VALUES(`OPENDATE`),
+     `COMPLAINT_TYPE` = VALUES(`COMPLAINT_TYPE`),
+     `DESCRIPTOR` = VALUES(`DESCRIPTOR`),
+     `ZIP` = VALUES(`ZIP`),
+     `BOROUGH` = VALUES(`BOROUGH`),
+     `CITY` = VALUES(`CITY`),
+     `COUNCIL_DIST` = VALUES(`COUNCIL_DIST`),
+     `COMMUNITY_BOARD` = VALUES(`COMMUNITY_BOARD`),
+     `CLOSEDATE` = VALUES(`CLOSEDATE`),
+     `OPENDATE_INT` = VALUES(`OPENDATE_INT`),
+     `CLOSEDATE_INT` = VALUES(`CLOSEDATE_INT`)"
 );
 
 $count = 0;
+$duplicateCount = 0;
 while (($row = fgetcsv($handle, 0, ',')) !== false) {
   $record = array_combine($headers, $row);
   if ($record === false) {
@@ -72,10 +86,17 @@ while (($row = fgetcsv($handle, 0, ',')) !== false) {
     ':closedate_int' => $closeDate !== '' ? strtotime($closeDate) : null,
   ]);
 
+  if ($insert->rowCount() > 1) {
+    $duplicateCount++;
+  }
+
   $count++;
 }
 
 fclose($handle);
 
 echo "Seeded {$count} rows.\n";
+if ($duplicateCount > 0) {
+  echo "Skipped {$duplicateCount} duplicate rows based on UNIQUE_KEY.\n";
+}
 ?>
