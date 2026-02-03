@@ -46,8 +46,19 @@ limitations under the License.
   //var_dump($categoryTree);
 
 
-  $activeCategory = $categoryTree[$active['category']];
-  $activeSubCategory = $categoryTree[$active['category']]['subCategories'][$active['subCategory']];
+  $hasActiveRoute = isset($categoryTree[$active['category']]['subCategories'][$active['subCategory']]);
+  $activeCategory = $hasActiveRoute ? $categoryTree[$active['category']] : null;
+  $activeSubCategory = $hasActiveRoute ? $categoryTree[$active['category']]['subCategories'][$active['subCategory']] : null;
+  if (!$activeCategory || !$activeSubCategory) {
+    $defaultCategorySlug = array_key_first($categoryTree);
+    $activeCategory = $defaultCategorySlug ? $categoryTree[$defaultCategorySlug] : null;
+    $defaultSubCategorySlug = $activeCategory ? array_key_first($activeCategory['subCategories'] ?? []) : null;
+    $activeSubCategory = $defaultSubCategorySlug ? $activeCategory['subCategories'][$defaultSubCategorySlug] : null;
+  }
+  $activeCategoryName = $activeCategory['name'] ?? '';
+  $activeCategorySlug = $activeCategory['slug'] ?? '';
+  $activeSubCategoryName = $activeSubCategory['name'] ?? '';
+  $activeSubCategorySlug = $activeSubCategory['slug'] ?? '';
   //var_dump($activeCategory);
   //var_dump($activeSubCategory);
 
@@ -55,7 +66,6 @@ limitations under the License.
   // get member data
   $contents = substr(file_get_contents('data/districts-data.js'), 20);
 
-  $contents = utf8_encode($contents);
   $results = json_decode($contents,true);
 
   foreach( $results['features'] as &$feature ) {
@@ -66,7 +76,7 @@ limitations under the License.
   }
 
 
-  if($activeCategory && $activeSubCategory){
+  if($hasActiveRoute){
 
 
     $statement = $db->prepare("SELECT `ACCOUNT`, COUNT(*) AS count FROM `cases` WHERE `COMPLAINT_TYPE` LIKE :complaint_type AND `DESCRIPTOR` LIKE :descriptor AND `BOROUGH` != '' GROUP BY `ACCOUNT` ORDER BY count DESC LIMIT 10");
@@ -85,7 +95,7 @@ limitations under the License.
       $member['districtFull'] = $allMembers[$member['district']]['districtFull'];
       $member['categories'] = [];
 
-      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
+      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `COMPLAINT_TYPE`, `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
       $statement2->execute([
         ':account' => $member['ACCOUNT'],
       ]);
@@ -131,7 +141,7 @@ limitations under the License.
       $member['districtFull'] = $allMembers[$member['district']]['districtFull'];
       $member['categories'] = [];
 
-      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
+      $statement2 = $db->prepare("SELECT `COMPLAINT_TYPE`, `DESCRIPTOR`, COUNT(*) AS count FROM `cases` WHERE `ACCOUNT` LIKE :account AND `BOROUGH` != '' GROUP BY `COMPLAINT_TYPE`, `DESCRIPTOR` ORDER BY count DESC LIMIT 7");
       $statement2->execute([
         ':account' => $member['ACCOUNT'],
       ]);
@@ -175,7 +185,7 @@ limitations under the License.
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="msapplication-tap-highlight" content="no">
-    <meta name="description" content="#CallNYC <?php echo $activeSubCategory['name'] ?> Help: Free <?php echo ucwords($activeCategory['name']) ?> Assistance from Top New York City Council Members">
+    <meta name="description" content="#CallNYC <?php echo $activeSubCategoryName ?> Help: Free <?php echo ucwords($activeCategoryName) ?> Assistance from Top New York City Council Members">
     <?php
       if($frontPage){
         ?>
@@ -187,10 +197,10 @@ limitations under the License.
         <?php
       } else {
         ?>
-          <title><?php echo ucwords($activeSubCategory['name']) ?> Assistance Top <?php echo count($members);?> - CallNYC.org | Free <?php echo ucwords($activeCategory['name']) ?> Services from New York City Council</title>
-          <link rel="canonical" href="<?php echo $baseUrl; ?>/<?php echo $activeCategory['slug'];?>/<?php echo $activeSubCategory['slug'];?>.html" />
+          <title><?php echo ucwords($activeSubCategoryName) ?> Assistance Top <?php echo count($members);?> - CallNYC.org | Free <?php echo ucwords($activeCategoryName) ?> Services from New York City Council</title>
+          <link rel="canonical" href="<?php echo $baseUrl; ?>/<?php echo $activeCategorySlug;?>/<?php echo $activeSubCategorySlug;?>.html" />
           <meta name="apple-mobile-web-app-title"
-                content="<?php echo ucwords($activeSubCategory['name']) ?>">
+                content="<?php echo ucwords($activeSubCategoryName) ?>">
 
         <?php
       }
