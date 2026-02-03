@@ -37,17 +37,19 @@ function connect_with_retry(array $config, int $maxAttempts = 30, int $sleepSeco
 $config = db_config();
 $pdo = connect_with_retry($config);
 
-$check = $pdo->prepare(
-  'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = :schema AND table_name = :table'
-);
-$check->execute([
-  ':schema' => $config['name'],
-  ':table' => 'cases',
-]);
+$needsSeed = true;
+try {
+  $count = (int) $pdo->query('SELECT COUNT(*) FROM `cases`')->fetchColumn();
+  if ($count > 0) {
+    $needsSeed = false;
+  }
+} catch (PDOException $e) {
+  if ($e->getCode() !== '42S02') {
+    throw $e;
+  }
+}
 
-$exists = (int) $check->fetchColumn() > 0;
-
-if ($exists) {
+if (!$needsSeed) {
   echo "Database already seeded.\n";
   exit(0);
 }
