@@ -32,6 +32,10 @@ limitations under the License.
   include_once('functions.php');
   include_once('phonenumbers.php');
 
+  function safe_trim($value, string $character_mask = " \t\n\r\0\x0B"): string {
+    return trim((string)($value ?? ''), $character_mask);
+  }
+
   //open db
   include_once('library/db.php');
   $db = get_db_connection();
@@ -100,12 +104,12 @@ limitations under the License.
         ':account' => $member['ACCOUNT'],
       ]);
       foreach( $statement2->fetchAll() as $row2 ) {
-        $memberCategory['name'] = trim($row2["DESCRIPTOR"], ' /');
+        $memberCategory['name'] = safe_trim($row2["DESCRIPTOR"], ' /');
         $memberCategory['DESCRIPTOR'] = $row2["DESCRIPTOR"];
         $memberCategory['slug'] = slugify($memberCategory['name']);
         $memberCategory['count'] = $row2["count"];
 
-        $memberCategory['parent']['name'] = trim($row2["COMPLAINT_TYPE"], ' /');
+        $memberCategory['parent']['name'] = safe_trim($row2["COMPLAINT_TYPE"], ' /');
         $memberCategory['parent']['COMPLAINT_TYPE'] = $row2["COMPLAINT_TYPE"];
         $memberCategory['parent']['slug'] = slugify($memberCategory['parent']['name']);
         $memberCategory['url']="/".$memberCategory['parent']['slug'].'/'.$memberCategory['slug'].'.html';
@@ -146,12 +150,12 @@ limitations under the License.
         ':account' => $member['ACCOUNT'],
       ]);
       foreach( $statement2->fetchAll() as $row2 ) {
-        $memberCategory['name'] = trim($row2["DESCRIPTOR"], ' /');
+        $memberCategory['name'] = safe_trim($row2["DESCRIPTOR"], ' /');
         $memberCategory['DESCRIPTOR'] = $row2["DESCRIPTOR"];
         $memberCategory['slug'] = slugify($memberCategory['name']);
         $memberCategory['count'] = $row2["count"];
 
-        $memberCategory['parent']['name'] = trim($row2["COMPLAINT_TYPE"], ' /');
+        $memberCategory['parent']['name'] = safe_trim($row2["COMPLAINT_TYPE"], ' /');
         $memberCategory['parent']['COMPLAINT_TYPE'] = $row2["COMPLAINT_TYPE"];
         $memberCategory['parent']['slug'] = slugify($memberCategory['parent']['name']);
         $memberCategory['url']="/".$memberCategory['parent']['slug'].'/'.$memberCategory['slug'].'.html';
