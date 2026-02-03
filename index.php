@@ -236,8 +236,6 @@ limitations under the License.
           content="yes">
 
 
-
-
     <!-- CSS-->
     <!-- <link href="/css/prism.css" rel="stylesheet"> -->
     <link href="/css/ghpages-materialize.css" type="text/css" rel="stylesheet" media="screen,projection">
@@ -392,9 +390,9 @@ limitations under the License.
             <div id="<?php echo trim($member['ACCOUNT'])?>" class="section scrollspy">
 
               <div class="card">
-                <a  target="_blank" href="http://labs.council.nyc/districts/<?php echo $member['district'];?>/">
+                <a  target="_blank" href="https://web.archive.org/web/20170710152429/https://council.nyc.gov/district-<?php echo $member['district'];?>/">
                   <div class="card-image">
-                    <img src="http://labs.council.nyc/images/councilmember-<?php echo $member['district']?>.jpg">
+                    <img src="/data/photos/banner/<?php echo $member['district']?>.jpg">
                     <span class="card-title">
                       <?php if($n){
                         /*
